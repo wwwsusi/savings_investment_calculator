@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalkulačky: úver, hypotéka a sporenie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:#F6F4EE;color:#1B2A27}
+main{max-width:1440px;margin:0 auto;padding:40px 32px 56px;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end}
+h1{margin:0 0 6px;font-size:34px;font-weight:800;letter-spacing:-.5px}
+header p{margin:0;font-size:16px;color:#4A5550;max-width:760px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#3B4540;font-weight:600;min-width:0}
+.fld{display:flex;align-items:center;gap:8px;border:1px solid #BDB8A8;border-radius:10px;background:#fff;height:44px;padding:0 14px}
+.fld:focus-within{border-color:#1B2A27;box-shadow:0 0 0 3px rgba(27,42,39,.18)}
+.fld input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:16px;color:#1B2A27;text-align:right}
+.u{color:#4A5550;font-weight:500;min-width:30px}
+select,input[type=date],.ex-amt{height:44px;border:1px solid #BDB8A8;border-radius:10px;background:#fff;font:inherit;font-size:16px;color:#1B2A27;padding:0 10px;min-width:0}
+.sync{background:#fff;border:1px solid #E3DFD3;border-radius:16px;padding:20px 24px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between}
+.sync h2{margin:0 0 4px;font-size:18px;font-weight:800}
+.sync p{margin:0;font-size:13px;color:#4A5550;max-width:360px}
+.sync-f{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.sync-f label{width:170px}
+.apply{height:44px;padding:0 20px;border:0;border-radius:10px;background:#1B2A27;color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.chips{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-top:1px solid #EEEBE1;padding-top:16px}
+.chips>span{font-size:13px;font-weight:600;color:#3B4540}
+.chip{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border:1px solid #BDB8A8;border-radius:10px;background:#fff;color:#1B2A27;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.box{width:18px;height:18px;border-radius:4px;border:2px solid #1B2A27;display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:#fff}
+.chip[aria-checked=true] .box{background:#1B2A27}
+.bn{background:#1B2A27;color:#fff;border-radius:16px;padding:16px 24px;display:flex;flex-direction:column;gap:16px}
+.bn-top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.bn-top>div{flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.bn h2{margin:0;font-size:16px;font-weight:800}
+.verdict{margin:0;font-size:15px;font-weight:700;line-height:1.4}
+.tog{height:44px;padding:0 20px;border:1px solid #fff;border-radius:10px;background:transparent;color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.bn-d{display:none;flex-direction:column;gap:16px}
+.bn-d p{margin:0;font-size:13px;line-height:1.5;color:#C9D3CF;max-width:900px}
+.tiles{display:flex;flex-wrap:wrap;gap:12px}
+.tile{flex:1 1 200px;min-width:0;background:rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.tile span{font-size:12px;color:#C9D3CF}.tile b{font-size:20px;font-weight:800}
+.bn .rows{gap:8px}
+.bn .row{border-top-color:rgba(255,255,255,.15)}
+.bn .row span{color:#C9D3CF}
+.bn .chips{border:0;padding:0;flex:none}
+.bn .chips>span{color:#fff}
+.bn .chip{border-color:#fff;background:transparent;color:#fff}
+.bn .box{border-color:#fff}
+.bn .chip[aria-checked=true] .box{background:#fff;color:#1B2A27}
+.bn-c{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.bn-c label{width:230px;color:#fff}
+.bn-c input{height:44px;border:1px solid #BDB8A8;border-radius:10px;background:#fff;font:inherit;font-size:16px;color:#1B2A27;padding:0 14px;text-align:right;min-width:0}
+.bn-c .white{height:44px;padding:0 20px;border:0;border-radius:10px;background:#fff;color:#1B2A27;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px;align-items:start}
+.card{background:#fff;border:1px solid #E3DFD3;border-radius:16px;overflow:hidden}
+.card.m{--c:#1F3A5F;--t:#E8EEF6;--d:#1F3A5F}
+.card.h{--c:#7A3B5E;--t:#F3E8EF;--d:#5E2B47}
+.card.c{--c:#2F6F62;--t:#E6F1EE;--d:#24574C}
+.card.s{--c:#B9852B;--t:#F6EEDC;--d:#6B4A0E}
+.head{border-top:6px solid var(--c);padding:20px 24px 16px}
+.head h2{margin:0 0 4px;font-size:20px;font-weight:800}
+.head span{font-size:13px;color:#4A5550}
+.body{padding:0 24px 24px;display:flex;flex-direction:column;gap:14px}
+.inputs{display:flex;flex-direction:column;gap:14px}
+@media (min-width:1000px){.inputs{min-height:400px}}
+.pair{display:flex;gap:10px}.pair>label{flex:1}.pair>label:first-child{flex:0 1 40%}
+.pair select,.pair input[type=date]{width:100%}
+.pair .fld{padding:0 10px;gap:6px}.pair .u{font-size:13px;min-width:0}
+.pay{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:8px;font-size:13px;color:#3B4540;font-weight:600}
+.pay b{font-size:18px;font-weight:800;color:var(--d)}
+.hero{background:var(--t);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.hero span{font-size:13px;font-weight:600;color:var(--d)}
+.hero b{font-size:28px;font-weight:800;color:var(--d)}
+.rows{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:14px;border-top:1px solid #EEEBE1;padding-top:10px}
+.row span{color:#4A5550}.row strong{text-align:right}
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#E3DFD3}
+.barl{display:flex;justify-content:space-between;font-size:12px;color:#4A5550;margin-top:4px}
+.ex{border-top:1px solid #EEEBE1;padding-top:16px;display:flex;flex-direction:column;gap:12px}
+.ex h3{margin:0;font-size:15px;font-weight:800}
+.exi{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:#FAF8F3;border-radius:10px;padding:10px;margin-bottom:12px}
+.exi label{flex:1 1 130px;font-size:12px;gap:4px}
+.exi label.full{flex:1 1 100%}
+.exi .ex-amt{text-align:right}
+.exi button{width:44px;height:44px;border:1px solid #BDB8A8;border-radius:10px;background:#fff;color:var(--c);font-size:22px;line-height:1;cursor:pointer}
+.add{height:44px;border:1px solid var(--c);border-radius:10px;background:#fff;color:var(--d);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.note{margin:4px 0 0;font-size:12px;line-height:1.5;color:#5A645F}
+.hint{margin:0;font-size:12px;line-height:1.5;color:#5A645F}
+footer{font-size:12px;color:#5A645F}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div>
+<h1>Úver, hypotéka a sporenie</h1>
+<p>Štyri nezávislé kalkulačky vedľa seba. Zmeňte ľubovoľné číslo a výsledky sa prepočítajú hneď.</p>
+</div>
+<label style="width:140px">Mena
+<select data-s="cur"><option>Kč</option><option>€</option></select>
+</label>
+</header>
+
+<section class="sync" aria-label="Spoločné údaje">
+<div><h2>Spoločné údaje</h2><p>Zadajte raz a použite vo vybraných kalkulačkách. Pri hypotéke sa k sume pripočítajú vlastné zdroje, ktoré tam máte zadané.</p></div>
+<div class="sync-f">
+<label>Výška úveru / vkladu<span class="fld"><input type="text" inputmode="decimal" data-s="gAmount"><span class="u cur">Kč</span></span></label>
+<label>Úroková sadzba p.a.<span class="fld"><input type="text" inputmode="decimal" data-s="gRate"><span class="u">%</span></span></label>
+<label>Doba<span class="fld"><input type="text" inputmode="decimal" data-s="gYears"><span class="u">rokov</span></span></label>
+<button type="button" class="apply" data-act="applyAll">Použiť vo vybraných kalkulačkách</button>
+</div>
+<div class="chips" id="gChecks" role="group" aria-label="Použiť pre"></div>
+</section>
+
+<section class="bn" aria-label="Optimalizácia mimoriadnej splátky">
+<div class="bn-top">
+<div><h2>Optimalizácia: mimoriadna splátka zo sporenia</h2><p class="verdict" data-o="bnVerdict"></p></div>
+<button type="button" class="tog" data-act="toggleBn" aria-expanded="false" data-o="bnToggle">Zobraziť detaily</button>
+</div>
+<div class="bn-d" id="bnDetails">
+<p>Porovná najdrahší úver (klasický úver alebo hypotéka) s najmenej výnosným sporením (klasický alebo zložený účet) a určí, či sa oplatí splácať zo sporenia, kedy a koľko.</p>
+<div class="tiles" data-o="bnRates"></div>
+<div class="rows" data-o="bnLines"></div>
+<div class="chips" id="bnChecks" role="group" aria-label="Počítať so sporením"></div>
+<div class="bn-c">
+<label>Rezerva, ktorú nechať na sporení (<span class="cur">Kč</span>)<input type="text" inputmode="decimal" data-s="gReserve"></label>
+<button type="button" class="white" data-act="applyBn" data-o="bnApply">Zapísať odporúčanie do kalkulačky</button>
+</div>
+<p>Pravidlo: splácať sa oplatí, ak efektívny úrok úveru (1 + r/12)<sup>12</sup> − 1 je vyšší ako čistý efektívny výnos sporenia po dani. Výhoda rastie lineárne so sumou aj s časom, preto je optimum „čo najskôr a čo najviac“, až do zostatku úveru a rezervy. Ak jeden účet nestačí, berie sa najprv z menej výnosného a potom z ďalšieho, ak má tiež nižší výnos než úver; rezerva ostáva na najvýnosnejšom účte. Prínos = ušetrené úroky − stratený čistý výnos zo sporenia do konca pôvodnej doby úveru + výnos zo sporenia uvoľnených splátok. Nejde o finančné poradenstvo; overiť treba aj poplatky za predsplatenie a podmienky výberu zo sporenia.</p>
+</div>
+</section>
+
+<div class="cards" id="cards"></div>
+<footer>Výpočty sú orientačné a nenahrádzajú ponuku banky ani finančné poradenstvo.</footer>
+</main>
+<script>
+class Calc {
+constructor() {
+this.props = { currency: 'Kč' };
+this.state = {
+mLoan: '1000000', mRate: '6,4', mYears: '8', mStart: '2026-07-15', mMode: 'shorten', mExtras: [],
+cDep: '1000000', cRate: '1,5', cYears: '8', cTax: '15',
+sDep: '700000', sRate: '3,8', sN: '8', sUnit: 'years', sFreq: '12', sTax: '15',
+gAmount: '1000000', gRate: '4', gYears: '5', cStart: '2026-11-01', sStart: '2026-11-01', gReserve: '100000', bnOpen: false, bnUse: { c: true, s: true }, gUse: { m: true, h: true, c: true, s: true },
+hPrice: '5000000', hOwn: '1000000', hRate: '5,2', hYears: '30', hStart: '2026-11-01', hMode: 'shorten',
+extras: []
+};
+}
+setState(o) { Object.assign(this.state, o); refresh(); }
+renderVals() {
+const s = this.state;
+const cur = this.props.currency ?? 'Kč';
+const n = (v) => { const x = parseFloat(String(v).replace(/\s/g, '').replace(',', '.')); return isFinite(x) && x > 0 ? x : 0; };
+const f = (x) => (isFinite(x) ? Math.round(x) : 0).toLocaleString('sk-SK');
+const p = (x) => (isFinite(x) ? x : 0).toLocaleString('sk-SK', { maximumFractionDigits: 2 });
+
+const prog = (startD, months, intA, balA, intTotal) => {
+const td = new Date(); td.setHours(0, 0, 0, 0);
+if (startD > td) return [{ label: 'Stav k dnešnému dňu', value: 'splácanie ešte nezačalo' }];
+let kp = (td.getFullYear() - startD.getFullYear()) * 12 + td.getMonth() - startD.getMonth();
+if (td.getDate() < startD.getDate()) kp--;
+kp = Math.max(0, Math.min(kp, months));
+let pi = 0;
+for (let j = 1; j <= kp; j++) pi += intA[j] || 0;
+const bal = kp >= months ? 0 : (balA[kp] || 0);
+return [
+{ label: 'Splátok zaplatených doteraz', value: kp + ' z ' + months },
+{ label: 'Zaplatené úroky doteraz', value: f(pi) + ' ' + cur },
+{ label: 'Zostatok úveru k dnešnému dňu', value: f(bal) + ' ' + cur },
+{ label: 'Úroky, ktoré ešte zaplatíte', value: f(Math.max(0, intTotal - pi)) + ' ' + cur }
+];
+};
+const loan = n(s.mLoan);
+const N = Math.round(n(s.mYears) * 12);
+const i = n(s.mRate) / 1200;
+const pay = N > 0 ? (i > 0 ? loan * i / (1 - Math.pow(1 + i, -N)) : loan / N) : 0;
+const lStart = (() => { const d = new Date(s.mStart + 'T00:00:00'); return isNaN(d) ? new Date() : d; })();
+const lMap = {};
+s.mExtras.forEach((e) => {
+const a = n(e.amount); const D = new Date(e.date + 'T00:00:00');
+if (isNaN(D) || a <= 0) return;
+let d = (D.getFullYear() - lStart.getFullYear()) * 12 + D.getMonth() - lStart.getMonth();
+if (D.getDate() < lStart.getDate()) d -= 1;
+d = Math.max(0, d);
+if (d < N) lMap[d] = (lMap[d] || 0) + a;
+});
+let lb = loan, lp = pay, lPaid = 0, lInt = 0, lExtra = 0, lMonths = 0;
+const lAnn = (b, k) => k > 0 ? (i > 0 ? b * i / (1 - Math.pow(1 + i, -k)) : b / k) : 0;
+const lApply = (k) => {
+const x = Math.min(lMap[k] || 0, lb);
+if (x > 0) { lb -= x; lPaid += x; lExtra += x; if (s.mMode === 'reduce' && lb > 0.005) lp = lAnn(lb, N - k); }
+};
+const lIntA = [], lBalA = [];
+lApply(0);
+lBalA[0] = lb;
+for (let k = 1; k <= N && lb > 0.005; k++) {
+const it = lb * i; const pr = Math.min(lp - it, lb);
+lb -= pr; lPaid += pr + it; lInt += it; lMonths = k; lIntA[k] = it; lApply(k); lBalA[k] = lb;
+}
+const total = lPaid;
+const interest = lInt;
+const intPct = total > 0 ? interest / total * 100 : 0;
+const lEnd = new Date(lStart.getTime());
+lEnd.setMonth(lEnd.getMonth() + lMonths);
+const mRows = [
+{ label: 'Výška úveru', value: f(loan) + ' ' + cur },
+{ label: 'Úroky celkom', value: f(interest) + ' ' + cur },
+{ label: 'Úspora na úrokoch', value: f(Math.max(0, pay * N - loan - interest)) + ' ' + cur },
+{ label: 'Mimoriadne splátky spolu', value: f(lExtra) + ' ' + cur },
+{ label: 'Skutočná doba splácania', value: Math.floor(lMonths / 12) + ' r. ' + (lMonths % 12) + ' mes.' },
+{ label: 'Dátum poslednej splátky', value: lMonths > 0 ? lEnd.toLocaleDateString('sk-SK') : '-' }
+];
+mRows.push(...prog(lStart, lMonths, lIntA, lBalA, interest));
+if (s.mMode === 'reduce' && lExtra > 0) mRows.splice(4, 0, { label: 'Mesačná splátka po mimoriadnych', value: f(lp) + ' ' + cur });
+
+const wdAll = [].concat(
+s.mExtras.map((e) => ({ ...e, from: 'Klasický úver' })),
+s.extras.map((e) => ({ ...e, from: 'Hypotéka' }))
+);
+const wdFor = (src, startStr, termYears) => {
+const st = new Date(startStr + 'T00:00:00');
+const ok = [], bad = [];
+wdAll.forEach((e) => {
+if ((e.src || 'own') !== src) return;
+const a = n(e.amount), D = new Date(e.date + 'T00:00:00');
+if (a <= 0 || isNaN(D) || isNaN(st)) return;
+const tt = (D - st) / (365.25 * 86400000);
+(tt >= 0 && tt < termYears ? ok : bad).push({ t: tt, a, from: e.from, d: D.toLocaleDateString('sk-SK') });
+});
+ok.sort((x, y) => x.t - y.t);
+return { ok, bad };
+};
+const wdRows = (w) => w.ok.map((e) => ({ label: 'Výber ' + e.d + ' (' + e.from + ')', value: '−' + f(e.a) + ' ' + cur })).concat(w.bad.length ? [{ label: 'Výbery mimo obdobia sporenia (ignorované)', value: String(w.bad.length) }] : []);
+const cd = n(s.cDep), cy = n(s.cYears), ctax = n(s.cTax), crate = n(s.cRate) / 100;
+const cw = wdFor('c', s.cStart, cy);
+let cPrin = cd, cLast = 0, cg = 0, cShort = false;
+cw.ok.forEach((e) => { cg += cPrin * crate * (e.t - cLast); const take = Math.min(e.a, cPrin); if (take < e.a) cShort = true; cPrin -= take; cLast = e.t; });
+cg += cPrin * crate * (cy - cLast);
+const cdan = cg * ctax / 100;
+const cNetVal = cPrin + cg - cdan;
+const cRows = [
+{ label: 'Zostatok pred zdanením', value: f(cPrin + cg) + ' ' + cur },
+{ label: 'Úrok pred zdanením', value: f(cg) + ' ' + cur },
+{ label: 'Daň z úroku', value: f(cdan) + ' ' + cur },
+{ label: 'Úrok po zdanení', value: f(cg - cdan) + ' ' + cur }
+].concat(wdRows(cw), cShort ? [{ label: 'Upozornenie', value: 'výber presahuje zostatok' }] : []);
+
+const sd = n(s.sDep), sr = n(s.sRate) / 100, tx = n(s.sTax) / 100;
+const t = s.sUnit === 'months' ? n(s.sN) / 12 : n(s.sN);
+const m = Number(s.sFreq);
+const sw = wdFor('s', s.sStart, t);
+const gro = (rate) => {
+let v = sd, last = 0, drawn = 0, short = false;
+sw.ok.forEach((e) => { v *= Math.pow(1 + rate / m, m * (e.t - last)); const take = Math.min(e.a, v); if (take < e.a) short = true; v -= take; drawn += take; last = e.t; });
+v *= Math.pow(1 + rate / m, m * (t - last));
+return { v, drawn, short };
+};
+const gG = gro(sr), gN = gro(sr * (1 - tx));
+const gross = gG.v, net = gN.v;
+const sRows = [
+{ label: 'Suma pred zdanením', value: f(gross) + ' ' + cur },
+{ label: 'Výnos úrokov pred daňou', value: f(gross + gG.drawn - sd) + ' ' + cur },
+{ label: 'Výnos úrokov po dani', value: f(net + gN.drawn - sd) + ' ' + cur },
+{ label: 'Efektívny ročný výnos (pred daňou)', value: p((Math.pow(1 + sr / m, m) - 1) * 100) + ' %' }
+].concat(wdRows(sw), gN.short ? [{ label: 'Upozornenie', value: 'výber presahuje zostatok' }] : []);
+
+const hLoan = Math.max(0, n(s.hPrice) - n(s.hOwn));
+const hN = Math.round(n(s.hYears) * 12);
+const hi = n(s.hRate) / 1200;
+const ann = (b, k) => k > 0 ? (hi > 0 ? b * hi / (1 - Math.pow(1 + hi, -k)) : b / k) : 0;
+const hPay = ann(hLoan, hN);
+let startD = new Date(s.hStart + 'T00:00:00');
+if (isNaN(startD)) startD = new Date();
+const idxOf = (d) => {
+const D = new Date(d + 'T00:00:00');
+if (isNaN(D)) return -1;
+let diff = (D.getFullYear() - startD.getFullYear()) * 12 + D.getMonth() - startD.getMonth();
+if (D.getDate() < startD.getDate()) diff -= 1;
+return Math.max(0, diff);
+};
+const exMap = {};
+s.extras.forEach((e) => { const a = n(e.amount); const ix = idxOf(e.date); if (a > 0 && ix >= 0 && ix < hN) exMap[ix] = (exMap[ix] || 0) + a; });
+let bal = hLoan, pmt = hPay, paid = 0, intSum = 0, extraSum = 0, months = 0;
+const applyExtra = (k) => {
+const x = Math.min(exMap[k] || 0, bal);
+if (x > 0) { bal -= x; paid += x; extraSum += x; if (s.hMode === 'reduce' && bal > 0.005) pmt = ann(bal, hN - k); }
+};
+const hIntA = [], hBalA = [];
+applyExtra(0);
+hBalA[0] = bal;
+for (let k = 1; k <= hN && bal > 0.005; k++) {
+const it = bal * hi;
+const pr = Math.min(pmt - it, bal);
+bal -= pr; paid += pr + it; intSum += it; months = k; hIntA[k] = it;
+applyExtra(k);
+hBalA[k] = bal;
+}
+const baseInt = hPay * hN - hLoan;
+const endD = new Date(startD.getTime());
+endD.setMonth(endD.getMonth() + months);
+const hRows = [
+{ label: 'Výška úveru', value: f(hLoan) + ' ' + cur },
+{ label: 'Podiel úveru na cene (LTV)', value: p(n(s.hPrice) > 0 ? hLoan / n(s.hPrice) * 100 : 0) + ' %' },
+{ label: 'Úroky celkom', value: f(intSum) + ' ' + cur },
+{ label: 'Úspora na úrokoch', value: f(Math.max(0, baseInt - intSum)) + ' ' + cur },
+{ label: 'Mimoriadne splátky spolu', value: f(extraSum) + ' ' + cur },
+{ label: 'Skutočná doba splácania', value: Math.floor(months / 12) + ' r. ' + (months % 12) + ' mes.' },
+{ label: 'Dátum poslednej splátky', value: months > 0 ? endD.toLocaleDateString('sk-SK') : '-' }
+];
+hRows.push(...prog(startD, months, hIntA, hBalA, intSum));
+if (s.hMode === 'reduce' && extraSum > 0) hRows.splice(5, 0, { label: 'Mesačná splátka po mimoriadnych', value: f(pmt) + ' ' + cur });
+
+const parseD = (str) => { const d = new Date(str + 'T00:00:00'); return isNaN(d) ? null : d; };
+const isoD = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const effL = (r) => Math.pow(1 + r / 12, 12) - 1;
+const loanInt = (Lm, Nm, ir, extraK, extraAmt) => {
+const pm = ir > 0 ? Lm * ir / (1 - Math.pow(1 + ir, -Nm)) : Lm / Nm;
+let b = Lm, intr = 0, months = 0;
+const pays = [];
+if (extraK === 0) b -= Math.min(extraAmt, b);
+for (let k = 1; k <= Nm && b > 0.005; k++) {
+const it = b * ir, pr = Math.min(pm - it, b);
+b -= pr; intr += it; months = k; pays[k] = pr + it;
+if (k === extraK) b -= Math.min(extraAmt, b);
+}
+return { intr, months, pays };
+};
+const rnC = crate * (1 - ctax / 100), rnS = sr * (1 - tx);
+const bnLoans = [
+{ id: 'm', name: 'Klasický úver', L: loan, N, rate: n(s.mRate) / 100, start: s.mStart },
+{ id: 'h', name: 'Hypotéka', L: hLoan, N: hN, rate: n(s.hRate) / 100, start: s.hStart }
+].filter((x) => x.L > 0 && x.N > 0);
+const bnSrcs = [
+{ id: 'c', name: 'Klasický sporiaci účet', dep: cd, years: cy, start: s.cStart, eff: rnC, bal: () => cd, gain: (a, T) => a * rnC * T },
+{ id: 's', name: 'Zložené úročenie', dep: sd, years: t, start: s.sStart, eff: Math.pow(1 + rnS / m, m) - 1, bal: (dt) => sd * Math.pow(1 + rnS / m, m * dt), gain: (a, T) => a * (Math.pow(1 + rnS / m, m * T) - 1) }
+].filter((x) => x.dep > 0 && x.years > 0 && s.bnUse[x.id]);
+const bnRates = bnLoans.map((x) => ({ label: x.name + ' (úrok úveru)', value: p(effL(x.rate) * 100) + ' %' })).concat(bnSrcs.map((x) => ({ label: x.name + ' (čistý výnos)', value: p(x.eff * 100) + ' %' })));
+let bnVerdict = bnLoans.length && !bnSrcs.length ? 'Vyberte aspoň jeden sporiaci účet s vkladom.' : 'Zadajte úver aj vklad na sporení.', bnLines = [], bnRec = null;
+if (bnLoans.length && bnSrcs.length) {
+const bl = bnLoans.slice().sort((a, b) => effL(b.rate) - effL(a.rate))[0];
+const rL = effL(bl.rate);
+const ls = parseD(bl.start);
+const bestS = bnSrcs.slice().sort((a, b) => a.eff - b.eff)[0];
+const cand = bnSrcs.filter((x) => x.eff < rL - 1e-9).sort((a, b) => a.eff - b.eff);
+if (!ls || bnSrcs.some((x) => !parseD(x.start))) bnVerdict = 'Skontrolujte dátumy začiatku.';
+else if (!cand.length) bnVerdict = 'Nevyplatí sa: ' + bestS.name + ' vynáša po dani ' + p(bestS.eff * 100) + ' % ročne, úver stojí ' + p(rL * 100) + ' %. Peniaze nechajte na sporení.';
+else {
+let d = ls;
+cand.forEach((x) => { const sd2 = parseD(x.start); if (sd2 > d) d = sd2; });
+let k = (d.getFullYear() - ls.getFullYear()) * 12 + d.getMonth() - ls.getMonth();
+if (d.getDate() < ls.getDate()) k--;
+k = Math.max(0, k);
+const ir = bl.rate / 12, gr = Math.pow(1 + ir, k);
+const balK = k === 0 ? bl.L : (ir > 0 ? bl.L * gr - (bl.L * ir / (1 - Math.pow(1 + ir, -bl.N))) * (gr - 1) / ir : bl.L - bl.L / bl.N * k);
+let keep = n(s.gReserve), tot = 0;
+const avail = {};
+bnSrcs.slice().sort((a, b) => b.eff - a.eff).forEach((x) => {
+x.dt = (d - parseD(x.start)) / (365.25 * 86400000);
+const b0 = x.dt >= 0 && x.dt < x.years ? x.bal(x.dt) : 0;
+const hold = Math.min(b0, keep);
+tot += b0; x.b0 = b0;
+keep -= hold;
+avail[x.id] = b0 - hold;
+});
+let left = Math.floor(balK);
+const picks = [];
+cand.forEach((x) => { const take = Math.floor(Math.min(avail[x.id], left)); if (take >= 1) { picks.push({ x, take }); left -= take; } });
+const amt = picks.reduce((a, q) => a + q.take, 0);
+if (k >= bl.N || amt < 1) bnVerdict = 'Úver je drahší ako sporenie, ale k ' + d.toLocaleDateString('sk-SK') + ' nie je čo splácať alebo z čoho (zostatok mínus rezerva).';
+else {
+const a0 = loanInt(bl.L, bl.N, ir, 0, 0);
+const pm0 = ir > 0 ? bl.L * ir / (1 - Math.pow(1 + ir, -bl.N)) : bl.L / bl.N;
+const parts = (kk) => {
+const a1 = loanInt(bl.L, bl.N, ir, kk, amt);
+const saved = a0.intr - a1.intr;
+const lost = picks.reduce((a, q) => a + q.x.gain(q.take, Math.max(0, Math.min((bl.N - kk) / 12, q.x.years - q.x.dt - (kk - k) / 12))), 0);
+let reinv = 0;
+for (let j = 1; j <= bl.N; j++) {
+const freed = pm0 - (a1.pays[j] || 0);
+if (freed > 0.005) reinv += picks.reduce((a, q) => a + q.x.gain(freed * q.take / amt, (bl.N - j) / 12), 0);
+}
+return { a1, saved, lost, reinv, net: saved - lost + reinv };
+};
+const P0 = parts(k), a1 = P0.a1, saved = P0.saved, lost = P0.lost, reinv = P0.reinv;
+const delay = k + 1 < bl.N ? P0.net - parts(k + 1).net : P0.net;
+bnVerdict = 'Oplatí sa: ' + f(amt) + ' ' + cur + ' dňa ' + d.toLocaleDateString('sk-SK') + ' na „' + bl.name + '“ z ' + picks.map((q) => '„' + q.x.name + '“' + (picks.length > 1 ? ' (' + f(q.take) + ')' : '')).join(' a ') + '.';
+bnLines = [
+{ label: 'Dostupné na sporení spolu', value: f(tot) + ' ' + cur + ' (' + bnSrcs.map((x) => x.name + ' ' + f(x.b0 || 0)).join(' + ') + ')' },
+{ label: 'Úrok úveru vs. čistý výnos sporenia', value: p(rL * 100) + ' % vs. ' + picks.map((q) => p(q.x.eff * 100) + ' %').join(' / ') },
+{ label: 'Ušetrené na úrokoch úveru', value: f(saved) + ' ' + cur },
+{ label: 'Stratený čistý výnos zo sporenia (do konca doby úveru)', value: f(lost) + ' ' + cur },
+{ label: 'Výnos zo sporenia uvoľnených splátok', value: f(reinv) + ' ' + cur },
+{ label: 'Čistý prínos do konca doby úveru', value: f(saved - lost + reinv) + ' ' + cur },
+{ label: 'Úver sa splatí skôr o', value: Math.max(0, bl.N - a1.months) + ' mes.' },
+{ label: 'Každý mesiac odkladu stojí asi', value: f(delay) + ' ' + cur },
+{ label: 'Vyberie sa z', value: picks.map((q) => q.x.name + ' ' + f(q.take)).join('; ') },
+{ label: 'Na sporení zostane (rezerva ' + f(n(s.gReserve)) + ')', value: f(tot - amt) + ' ' + cur },
+{ label: 'Rezerva obmedzuje výber', value: amt < Math.floor(balK) ? 'áno' : 'nie, výber obmedzuje len zostatok úveru' }
+];
+bnRec = { id: bl.id, items: picks.map((q) => ({ date: isoD(d), amount: String(q.take), src: q.x.id })) };
+}
+}
+}
+const applyBn = () => {
+if (!bnRec) return;
+if (bnRec.id === 'm') this.setState({ mExtras: s.mExtras.concat(bnRec.items) });
+else this.setState({ extras: s.extras.concat(bnRec.items) });
+};
+const applyAll = () => {
+const u = s.gUse, patch = {};
+if (u.m) Object.assign(patch, { mLoan: s.gAmount, mRate: s.gRate, mYears: s.gYears });
+if (u.h) Object.assign(patch, { hPrice: String(n(s.gAmount) + n(s.hOwn)), hRate: s.gRate, hYears: s.gYears });
+if (u.c) Object.assign(patch, { cDep: s.gAmount, cRate: s.gRate, cYears: s.gYears });
+if (u.s) Object.assign(patch, { sDep: s.gAmount, sRate: s.gRate, sN: s.gYears, sUnit: 'years' });
+this.setState(patch);
+};
+return {
+cur, applyAll, applyBn, bnVerdict, bnRates, bnLines, bnShowApply: !!bnRec,
+mPay: f(pay), mTotal: f(total), mRows, mInterestPct: intPct,
+hPayShow: f(hPay), hTotal: f(paid), hRows,
+cNet: f(cNetVal), cRows, sNet: f(net), sRows
+};
+}
+}
+
+/* ---------- UI ---------- */
+const calc = new Calc();
+const FORM = 'Vzorec: M = U · i / (1 − (1 + i)<sup>−N</sup>), kde U je výška úveru, i = úrok p.a. / 12 a N počet mesiacov. Mimoriadna splátka sa odpočíta od zostatku po poslednej riadnej splátke pred zadaným dátumom.';
+const field = (label, k, unit) => `<label>${label}<span class="fld"><input type="text" inputmode="decimal" data-s="${k}"><span class="u${unit === 'cur' ? ' cur' : ''}">${unit === 'cur' ? calc.props.currency : unit}</span></span></label>`;
+const hero = (label, o) => `<div class="hero"><span>${label}</span><b data-o="${o}"></b></div>`;
+const rowsBox = (o) => `<div class="rows" data-o="${o}"></div>`;
+const shell = (id, title, sub, body) => `<section class="card ${id}"><div class="head"><h2>${title}</h2><span>${sub}</span></div><div class="body">${body}</div></section>`;
+const startBlock = (k, hintText) => `<div class="ex"><label>Začiatok sporenia<input type="date" data-s="${k}Start"></label><p class="hint">Mimoriadne splátky úveru označené „${hintText}“ sa odpočítajú z tohto účtu k zvolenému dátumu.</p></div>`;
+const loanCard = (id, title, sub, fields, bar) => shell(id, title, sub, `
+<div class="inputs">${fields}
+<div class="pair"><label>Doba splácania<span class="fld"><input type="text" inputmode="decimal" data-s="${id}Years"><span class="u">rokov</span></span></label>
+<label>Začiatok splácania<input type="date" data-s="${id}Start"></label></div>
+<div class="pay">Mesačná splátka<b data-o="${id}Pay"></b></div></div>
+${hero('Zaplatené celkom', id + 'Total')}
+${bar ? `<div><div class="bar"><div data-o="${id}B1" style="background:#1F3A5F"></div><div data-o="${id}B2" style="background:#C0562F"></div></div><div class="barl"><span data-o="${id}L1"></span><span data-o="${id}L2"></span></div></div>` : ''}
+${rowsBox(id + 'Rows')}
+<div class="ex"><h3>Mimoriadne splátky</h3>
+<label>Po mimoriadnej splátke<select data-s="${id}Mode"><option value="shorten">skrátiť dobu splácania</option><option value="reduce">znížiť mesačnú splátku</option></select></label>
+<div id="exl-${id}"></div>
+<button type="button" class="add" data-act="add" data-id="${id}">Pridať mimoriadnu splátku</button></div>
+<p class="note">${FORM}</p>`);
+document.getElementById('cards').innerHTML = [
+loanCard('m', 'Klasický úver', 'Anuitná splátka, mesačne', field('Výška úveru', 'mLoan', 'cur') + field('Úroková sadzba p.a.', 'mRate', '%'), true),
+loanCard('h', 'Hypotéka', 'Anuita s mimoriadnymi splátkami', field('Cena nehnuteľnosti', 'hPrice', 'cur') + field('Vlastné zdroje', 'hOwn', 'cur') + field('Úroková sadzba p.a.', 'hRate', '%'), false),
+shell('c', 'Klasický sporiaci účet', 'Jednoduché úročenie', `
+<div class="inputs">${field('Vložená suma', 'cDep', 'cur') + field('Úroková sadzba p.a.', 'cRate', '%') + field('Doba sporenia', 'cYears', 'rokov') + field('Výška dane', 'cTax', '%')}</div>
+${hero('Zostatok po zdanení', 'cNet')}${rowsBox('cRows')}${startBlock('c', 'zo sporiaceho účtu')}
+<p class="note">Vzorec: Úrok = V · p/100 · t, kde V je vklad, p úrok p.a. a t doba v rokoch. Daň = úrok · sadzba dane. Úrok sa nepripisuje k vkladu.</p>`),
+shell('s', 'Zložené úročenie', 'Jednorazovo vložená suma', `
+<div class="inputs">${field('Vložená suma', 'sDep', 'cur') + field('Úroková sadzba p.a.', 'sRate', '%')}
+<div class="pair"><label>Splatnosť<span class="fld"><input type="text" inputmode="decimal" data-s="sN"></span></label>
+<label>Jednotka<select data-s="sUnit"><option value="years">rokov</option><option value="months">mesiacov</option></select></label></div>
+<label>Frekvencia pripisovania úrokov<select data-s="sFreq"><option value="365">denne</option><option value="52">týždenne</option><option value="12">mesačne</option><option value="4">štvrťročne</option><option value="2">polročne</option><option value="1">ročne</option></select></label>
+${field('Výška dane', 'sTax', '%')}</div>
+${hero('Našetrená suma po zdanení', 'sNet')}${rowsBox('sRows')}${startBlock('s', 'zo zloženého úročenia')}
+<p class="note">Vzorec: K = V · (1 + p/m)<sup>m·t</sup>, kde m je počet pripísaní za rok. Po zdanení sa použije sadzba p · (1 − daň), čiže daň sa strháva pri každom pripísaní úroku.</p>`)
+].join('');
+
+const $ = (sel) => document.querySelector(sel);
+const O = (k) => $(`[data-o="${k}"]`);
+const rowsHtml = (a) => a.map((r) => `<div class="row"><span>${r.label}</span><strong>${r.value}</strong></div>`).join('');
+const chip = (grp, k, label, on) => `<button type="button" class="chip" role="checkbox" aria-checked="${on}" data-chip="1" data-grp="${grp}" data-k="${k}"><span class="box">${on ? '✓' : ''}</span>${label}</button>`;
+function renderChips() {
+const s = calc.state;
+$('#gChecks').innerHTML = '<span>Použiť pre:</span>' + [['m', 'Klasický úver'], ['h', 'Hypotéka'], ['c', 'Klasický sporiaci účet'], ['s', 'Zložené úročenie']].map(([k, l]) => chip('gUse', k, l, s.gUse[k])).join('');
+$('#bnChecks').innerHTML = '<span>Počítať so sporením:</span>' + [['c', 'Klasický sporiaci účet'], ['s', 'Zložené úročenie']].map(([k, l]) => chip('bnUse', k, l, s.bnUse[k])).join('');
+}
+function renderEx(id) {
+const list = calc.state[id === 'm' ? 'mExtras' : 'extras'];
+const opt = (v, cur, label) => `<option value="${v}"${cur === v ? ' selected' : ''}>${label}</option>`;
+$('#exl-' + id).innerHTML = list.map((x, i) => `<div class="exi">
+<label>Dátum<input type="date" value="${x.date}" data-ex="${id}" data-i="${i}" data-f="date"></label>
+<label>Suma (<span class="cur">${calc.props.currency}</span>)<input type="text" inputmode="decimal" class="ex-amt" value="${x.amount}" data-ex="${id}" data-i="${i}" data-f="amount"></label>
+<button type="button" aria-label="Odstrániť mimoriadnu splátku" data-del="${id}" data-i="${i}">×</button>
+<label class="full">Zdroj peňazí<select data-ex="${id}" data-i="${i}" data-f="src">${opt('own', x.src || 'own', 'vlastné peniaze (mimo sporenia)')}${opt('c', x.src, 'zo sporiaceho účtu')}${opt('s', x.src, 'zo zloženého úročenia')}</select></label></div>`).join('');
+}
+function syncInputs() {
+document.querySelectorAll('[data-s]').forEach((el) => {
+const k = el.dataset.s;
+if (k !== 'cur' && el !== document.activeElement) el.value = calc.state[k];
+});
+}
+function paint() {
+const v = calc.renderVals(), c = calc.props.currency, s = calc.state;
+document.querySelectorAll('.cur').forEach((el) => { el.textContent = c; });
+O('mPay').textContent = v.mPay + ' ' + c; O('mTotal').textContent = v.mTotal + ' ' + c;
+O('hPay').textContent = v.hPayShow + ' ' + c; O('hTotal').textContent = v.hTotal + ' ' + c;
+O('cNet').textContent = v.cNet + ' ' + c; O('sNet').textContent = v.sNet + ' ' + c;
+['mRows', 'hRows', 'cRows', 'sRows'].forEach((k) => { O(k).innerHTML = rowsHtml(v[k]); });
+const pct = Math.round(v.mInterestPct * 100) / 100;
+O('mB1').style.width = (100 - pct) + '%'; O('mB2').style.width = pct + '%';
+O('mL1').textContent = 'Istina ' + (100 - pct).toLocaleString('sk-SK', { maximumFractionDigits: 2 }) + ' %';
+O('mL2').textContent = 'Úrok ' + pct.toLocaleString('sk-SK', { maximumFractionDigits: 2 }) + ' %';
+O('bnVerdict').textContent = v.bnVerdict;
+O('bnRates').innerHTML = v.bnRates.map((r) => `<div class="tile"><span>${r.label}</span><b>${r.value}</b></div>`).join('');
+O('bnLines').innerHTML = rowsHtml(v.bnLines);
+O('bnApply').style.display = v.bnShowApply ? 'inline-flex' : 'none';
+$('#bnDetails').style.display = s.bnOpen ? 'flex' : 'none';
+O('bnToggle').textContent = s.bnOpen ? 'Skryť detaily' : 'Zobraziť detaily';
+O('bnToggle').setAttribute('aria-expanded', String(s.bnOpen));
+}
+function refresh() { syncInputs(); renderEx('m'); renderEx('h'); renderChips(); paint(); }
+
+const onEdit = (e) => {
+const t = e.target;
+if (t.dataset.s) {
+if (t.dataset.s === 'cur') calc.props.currency = t.value; else calc.state[t.dataset.s] = t.value;
+paint();
+} else if (t.dataset.ex) {
+calc.state[t.dataset.ex === 'm' ? 'mExtras' : 'extras'][+t.dataset.i][t.dataset.f] = t.value;
+paint();
+}
+};
+document.addEventListener('input', onEdit);
+document.addEventListener('change', onEdit);
+document.addEventListener('click', (e) => {
+const b = e.target.closest('[data-act],[data-chip],[data-del]');
+if (!b) return;
+const s = calc.state;
+if (b.dataset.chip) { s[b.dataset.grp][b.dataset.k] = !s[b.dataset.grp][b.dataset.k]; refresh(); return; }
+if (b.dataset.del) { s[b.dataset.del === 'm' ? 'mExtras' : 'extras'].splice(+b.dataset.i, 1); refresh(); return; }
+const a = b.dataset.act;
+if (a === 'applyAll') calc.renderVals().applyAll();
+else if (a === 'applyBn') calc.renderVals().applyBn();
+else if (a === 'toggleBn') calc.setState({ bnOpen: !s.bnOpen });
+else if (a === 'add') {
+const id = b.dataset.id, key = id === 'm' ? 'mExtras' : 'extras';
+calc.setState({ [key]: s[key].concat([{ date: s[id + 'Start'], amount: '', src: 'own' }]) });
+}
+});
+refresh();
+</script>
+</body>
+</html>
